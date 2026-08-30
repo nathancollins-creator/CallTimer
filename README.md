@@ -21,10 +21,13 @@ involved, but you are the first one to actually build and run it.
 - **No termination code at all.** `CallTimerEngine` has no concept of ending
   a call — it only has `start()` and `ended()`. There is nothing in this
   repo that could accidentally hang up a call even by mistake.
-- **No WhatsApp code in this version.** `CallSource.CELLULAR` and
-  `CallSource.TEST` are implemented; `WHATSAPP` is left as a documented gap
-  in the enum for a future version to slot into the same engine, but no
-  WhatsApp files exist yet — nothing to maintain or debug for V1.
+- **WhatsApp detection is back, alert-only.** Same accessibility-based
+  approach as the very first version, minus every line of code that used to
+  click WhatsApp's own controls — this version only ever reads what's on
+  screen.
+- **Selectable time-limit alert styles.** Default alarm sound, a siren, a
+  warble, a spoken announcement, or any ringtone already on your phone — see
+  section 3 below for how each one actually works under the hood.
 
 ## 2. The one honest limitation (Step 1 finding)
 
@@ -48,7 +51,60 @@ detection) already implements — happy to help you go back to that path
 specifically for detection (with termination still stripped out) if you'd
 rather trade simplicity for that accuracy.
 
-## 3. Building the APK — recommended path: GitHub Actions (no local install)
+## 3. How the alert styles actually work
+
+Android locks a notification's sound and vibration to whichever
+*notification channel* it's posted to (since Android 8) — a per-notification
+"play this sound" call is silently ignored once a channel exists. That rules
+out a simple implementation for two of the five styles here, since neither a
+spoken sentence nor a synthesized tone can be expressed as a channel's fixed
+sound file. So the two pieces are split:
+
+- The **visual notification** (`CallTimerNotification.kt`) is always silent
+  on its own — just text, always shown.
+- The **actual sound/speech/vibration** (`AlertPlayer.kt`) is triggered
+  imperatively, in code, at the exact moment the limit is reached:
+  - **Default** and **Custom ringtone** play a real media file via
+    `Ringtone.play()` (system default alarm sound, or whichever ringtone you
+    picked via Android's own ringtone picker).
+  - **Siren** and **Warble** use Android's built-in `ToneGenerator` to
+    synthesize a tone on the spot — no audio files involved at all, so
+    these work identically on every device.
+  - **Spoken announcement** uses Android's built-in text-to-speech engine to
+    say "Your call time limit has been reached" out loud. It's preloaded at
+    app startup (`CallTimerApp.kt`) so it has time to initialize before your
+    first real alert; if it somehow isn't ready in time, that's logged in
+    the event log rather than silently doing nothing.
+- **Vibrate** is its own toggle and applies on top of whichever style you
+  picked, including Spoken.
+
+## 4. WhatsApp calls — how it works, and its real limits
+
+Same situation as always: WhatsApp has no API for this, so detection works
+by watching WhatsApp's own screen via Android's Accessibility service and
+recognizing when its call screen is showing (primarily by looking for the
+running `Chronometer` widget WhatsApp itself uses for the call-duration
+readout — see the comment at the top of `WhatsAppCallDetector.kt`). This
+version **never** taps, clicks, or otherwise controls WhatsApp — it only
+reads what's already on screen and reports it to the same timer engine the
+cellular detector uses.
+
+**Two honest caveats:**
+- This is the most fragile part of the whole app. WhatsApp's UI can change
+  with any update and silently stop matching the detection hints — if
+  WhatsApp calls stop being detected after a WhatsApp update, that file is
+  the one to check and update, using `adb shell uiautomator dump` (or
+  Android Studio's Layout Inspector) against a live WhatsApp call.
+- Direction (incoming vs. outgoing) for WhatsApp calls is best-effort text
+  matching on the pre-connect screen and is noticeably less reliable than
+  the cellular path's exact signal.
+
+WhatsApp detection needs **two** separate opt-ins to do anything: the
+"WhatsApp calls" toggle on the main screen, AND Accessibility granted for
+Call Timer specifically in system Settings (Permissions / Setup → Enable
+Accessibility). Either one alone does nothing.
+
+## 5. Building the APK — recommended path: GitHub Actions (no local install)
 
 This is the one path I'd recommend. It builds the APK on GitHub's servers
 and gives you a `.zip` to download — nothing installs on your computer.
@@ -83,7 +139,7 @@ app, which lets you point it at the `CallTimer` folder directly and publish
 it with a few clicks — say the word if you hit that and I'll walk you
 through it.
 
-## 4. Setting it up on your Samsung Galaxy S24 Ultra
+## 6. Setting it up on your Samsung Galaxy S24 Ultra
 
 1. Install the APK (see above), open **Call Timer**.
 2. Go to **Permissions / Setup**:
@@ -96,33 +152,43 @@ through it.
      → Call Timer → Battery** and make sure it's not set to be put to sleep,
      and it isn't listed under **Settings → Battery → Background usage
      limits → Sleeping apps**.
-3. Back on the main screen, pick your duration (10 minutes is the default),
-   leave Warning/Sound/Vibrate on, tap **ENABLE CALL TIMER**. The status
-   should flip to 🟢 ACTIVE and a "Watching for calls" notification appears.
+   - If you want WhatsApp calls timed too: tap **Enable Accessibility** →
+     find "Call Timer" in the list → turn it on → confirm the warning
+     dialog.
+3. Back on the main screen: pick your duration (10 minutes is the default),
+   pick a time-limit alert style (and choose a ringtone if you picked
+   "Custom"), leave Warning/Vibrate on, turn on "WhatsApp calls" if you set
+   up Accessibility, then tap **ENABLE CALL TIMER**. Status should flip to
+   🟢 ACTIVE and a "Watching for calls" notification appears.
 
-## 5. Testing without waiting for a real call
+## 7. Testing without waiting for a real call
 
 **Test / Debug screen → pick 10s/30s/1m/5m/10m → START TEST.** This
-simulates a connected call and runs the exact same timer/notification code
-path a real call would. Watch the debug fields update live; use **End Test
-Call** to simulate hanging up and confirm the timer stops immediately.
+simulates a connected call and runs the exact same timer/notification/alert
+code path a real cellular call would (WhatsApp detection can only be tested
+with a real WhatsApp call, since it depends on WhatsApp's actual screen).
+Watch the debug fields update live; use **End Test Call** to simulate
+hanging up and confirm the timer stops immediately.
 
-## 6. Testing with a real call
+## 8. Testing with a real call
 
-1. With Call Timer enabled, have someone call you (or call them).
+1. With Call Timer enabled, have someone call you (or call them) — or, for
+   WhatsApp, start/receive a WhatsApp voice call with "WhatsApp calls" and
+   Accessibility both turned on.
 2. For a fast pass, set duration to 1 minute first so you're not waiting 10.
-3. **Incoming:** answer it — the timer should start at that exact moment.
-   **Outgoing:** the timer starts as soon as you dial (see the limitation
-   above) — the far end doesn't need to answer for the countdown to show up.
-4. At 1 minute remaining, a notification should appear (and the status
-   notification's text should change). At the limit, you should get the
-   stronger alert with sound/vibration per your toggles. The call keeps
+3. **Incoming (cellular):** answer it — the timer starts at that exact
+   moment. **Outgoing (cellular):** starts as soon as you dial (see the
+   limitation above). **WhatsApp:** starts once the call screen with the
+   running duration readout appears.
+4. At 1 minute remaining, a notification should appear. At the limit, you
+   should get your chosen alert style plus vibration (if on). The call keeps
    running — you hang up manually. The moment either side hangs up, the
    timer should stop and the notification should say "Call ended."
 
-## 7. Known limitations, plainly stated
+## 9. Known limitations, plainly stated
 
-- Outgoing-call start-time accuracy — covered above.
+- Outgoing-call start-time accuracy — covered in section 2.
+- WhatsApp detection fragility and direction accuracy — covered in section 4.
 - Background reliability is a genuine "should work, please confirm"
   item: a foreground service with a visible notification is the correct,
   Android-sanctioned way to stay alive in the background, and the battery
@@ -133,7 +199,7 @@ Call** to simulate hanging up and confirm the timer stops immediately.
 - Minimum Android version supported: 8.0 (API 26), chosen because dropping
   the dialer-role requirement removed the only reason V1 needed API 29+.
 
-## 8. Final report
+## 10. Final report
 
 **NORMAL CALL DETECTION:** WORKING for incoming calls, PARTIALLY WORKING for
 outgoing calls (starts a few seconds early — see the honest limitation
@@ -147,11 +213,15 @@ correct Android mechanism (foreground service + battery-optimization
 exemption) is in place, but Samsung-specific background-kill behavior can
 only be confirmed by testing on your actual S24 Ultra.
 
-**SOUND/VIBRATION ALERT:** WORKING as a mechanism — implemented using the
-only approach that actually respects per-alert toggles on Android 8+
-(separate notification channels per sound/vibrate combination; see the
-comment at the top of `CallTimerNotification.kt` for why a simpler
-per-notification `setSound()` call would have silently failed). Unverified
-on real hardware.
+**SOUND/VIBRATION/SPEECH ALERT:** WORKING as a mechanism for all five
+styles — implemented using the only approach that actually works on Android
+8+ (silent visual notification + sound/speech/vibration triggered
+imperatively in code; see section 3 for why a simpler per-notification
+`setSound()` call would have silently failed). Unverified on real hardware.
 
-**WHATSAPP:** NOT YET IMPLEMENTED — deliberately deferred per the brief.
+**WHATSAPP:** PARTIALLY WORKING / NEEDS ON-DEVICE VERIFICATION — the
+mechanism is correctly implemented with no stubs, but the exact detection
+signals are inherently dependent on your installed WhatsApp version and
+must be confirmed (and possibly tweaked in `WhatsAppCallDetector.kt`) on
+your actual phone. This is the same honest caveat WhatsApp detection has
+carried since the very first version.

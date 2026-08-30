@@ -43,6 +43,9 @@ class SetupActivity : AppCompatActivity() {
                 startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
             }
         }
+        binding.enableAccessibilityButton.setOnClickListener {
+            startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+        }
     }
 
     override fun onResume() {
@@ -65,5 +68,12 @@ class SetupActivity : AppCompatActivity() {
         val powerManager = getSystemService(POWER_SERVICE) as PowerManager
         val batteryExempt = powerManager.isIgnoringBatteryOptimizations(packageName)
         binding.batteryStatus.text = "Status: ${if (batteryExempt) "EXEMPTED" else "NOT EXEMPTED"}"
+
+        val expectedSuffix = "WhatsAppAccessibilityService"
+        val enabledServices = Settings.Secure.getString(
+            contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+        ) ?: ""
+        val accessibilityOn = enabledServices.split(':').any { it.contains(expectedSuffix) }
+        binding.accessibilityStatus.text = "Status: ${if (accessibilityOn) "ENABLED" else "NOT ENABLED"}"
     }
 }

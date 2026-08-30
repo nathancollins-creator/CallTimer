@@ -77,6 +77,7 @@ class TestActivity : AppCompatActivity(), CallTimerListener {
         val type = when {
             snapshot.state != CallState.CONNECTED -> "—"
             snapshot.source == CallSource.TEST -> "SIMULATED"
+            snapshot.source == CallSource.WHATSAPP -> "WHATSAPP (${snapshot.direction.name})"
             else -> "CELLULAR (${snapshot.direction.name})"
         }
         val timerStatus = when (snapshot.state) {

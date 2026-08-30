@@ -5,4 +5,5 @@
     <string name="channel_desc_status">Shows whether Call Timer is watching for calls, and the countdown once one connects</string>
     <string name="channel_name_alert">Call Timer alerts</string>
     <string name="channel_desc_alert">The 1-minute warning and time-limit-reached alert</string>
+    <string name="accessibility_service_description">Lets Call Timer detect when a WhatsApp voice call is on screen so it can time it and alert you. It only reads what\'s on screen while WhatsApp is open — it never reads or sends chat messages, and it never taps or controls anything in WhatsApp.</string>
 </resources>

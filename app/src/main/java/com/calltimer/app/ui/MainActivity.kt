@@ -3,9 +3,12 @@ package com.calltimer.app.ui
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -14,6 +17,7 @@ import com.calltimer.app.call.CallTimerEngine
 import com.calltimer.app.call.CallTimerListener
 import com.calltimer.app.call.CallTimerSnapshot
 import com.calltimer.app.databinding.ActivityMainBinding
+import com.calltimer.app.notification.AlertSoundMode
 import com.calltimer.app.notification.CallTimerService
 import com.calltimer.app.settings.AppSettings
 
@@ -21,6 +25,16 @@ class MainActivity : AppCompatActivity(), CallTimerListener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var settings: AppSettings
+
+    private val ringtonePickerLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val uri = result.data?.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+            if (uri != null) {
+                settings.customRingtoneUri = uri.toString()
+                updateCustomRingtoneLabel()
+                Toast.makeText(this, "Ringtone saved", Toast.LENGTH_SHORT).show()
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,14 +64,55 @@ class MainActivity : AppCompatActivity(), CallTimerListener {
         }
 
         binding.warningCheck.setOnCheckedChangeListener { _, checked -> settings.warningEnabled = checked }
-        binding.soundCheck.setOnCheckedChangeListener { _, checked -> settings.soundEnabled = checked }
         binding.vibrateCheck.setOnCheckedChangeListener { _, checked -> settings.vibrateEnabled = checked }
+        binding.whatsappCheck.setOnCheckedChangeListener { _, checked -> settings.whatsappEnabled = checked }
+
+        binding.alertSoundGroup.setOnCheckedChangeListener { _, checkedId ->
+            val mode = when (checkedId) {
+                binding.alertSiren.id -> AlertSoundMode.SIREN
+                binding.alertWarble.id -> AlertSoundMode.WARBLE
+                binding.alertSpoken.id -> AlertSoundMode.SPOKEN
+                binding.alertCustom.id -> AlertSoundMode.CUSTOM
+                else -> AlertSoundMode.DEFAULT
+            }
+            settings.alertSoundMode = mode
+            val isCustom = (mode == AlertSoundMode.CUSTOM)
+            binding.chooseRingtoneButton.visibility = if (isCustom) android.view.View.VISIBLE else android.view.View.GONE
+            binding.customRingtoneLabel.visibility = if (isCustom) android.view.View.VISIBLE else android.view.View.GONE
+            if (isCustom) updateCustomRingtoneLabel()
+        }
+        binding.chooseRingtoneButton.setOnClickListener { launchRingtonePicker() }
 
         binding.enableButton.setOnClickListener { onEnable() }
         binding.disableButton.setOnClickListener { onDisable() }
 
         binding.setupButton.setOnClickListener { startActivity(Intent(this, SetupActivity::class.java)) }
         binding.testButton.setOnClickListener { startActivity(Intent(this, TestActivity::class.java)) }
+    }
+
+    private fun launchRingtonePicker() {
+        val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
+            putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM)
+            putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
+            putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
+            val current = settings.customRingtoneUri
+            if (current != null) putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, Uri.parse(current))
+        }
+        ringtonePickerLauncher.launch(intent)
+    }
+
+    private fun updateCustomRingtoneLabel() {
+        val uriString = settings.customRingtoneUri
+        binding.customRingtoneLabel.text = if (uriString == null) {
+            "No ringtone chosen yet"
+        } else {
+            try {
+                val ringtone = RingtoneManager.getRingtone(this, Uri.parse(uriString))
+                "Selected: ${ringtone?.getTitle(this) ?: "Unknown"}"
+            } catch (_: Exception) {
+                "Selected ringtone (name unavailable)"
+            }
+        }
     }
 
     private fun onEnable() {
@@ -106,8 +161,22 @@ class MainActivity : AppCompatActivity(), CallTimerListener {
             }
         }
         binding.warningCheck.isChecked = settings.warningEnabled
-        binding.soundCheck.isChecked = settings.soundEnabled
         binding.vibrateCheck.isChecked = settings.vibrateEnabled
+        binding.whatsappCheck.isChecked = settings.whatsappEnabled
+
+        when (settings.alertSoundMode) {
+            AlertSoundMode.SIREN -> binding.alertSiren.isChecked = true
+            AlertSoundMode.WARBLE -> binding.alertWarble.isChecked = true
+            AlertSoundMode.SPOKEN -> binding.alertSpoken.isChecked = true
+            AlertSoundMode.CUSTOM -> {
+                binding.alertCustom.isChecked = true
+                binding.chooseRingtoneButton.visibility = android.view.View.VISIBLE
+                binding.customRingtoneLabel.visibility = android.view.View.VISIBLE
+                updateCustomRingtoneLabel()
+            }
+            AlertSoundMode.DEFAULT -> binding.alertDefault.isChecked = true
+        }
+
         updateStatusHeader()
     }
 

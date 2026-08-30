@@ -21,6 +21,15 @@
          request the permission silently or assume it's granted. -->
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
+    <!-- WhatsApp call detection - opted into via the WhatsApp calls toggle and
+         only takes effect once the user separately grants Accessibility for
+         this specific service in system Settings. Nothing here is requested
+         or used unless both of those are true. The actual protection is on
+         the <service> declaration below (android:permission=
+         "android.permission.BIND_ACCESSIBILITY_SERVICE"), which is how
+         Android ensures only the system itself can bind to it - apps don't
+         request that permission for themselves via <uses-permission>. -->
+
     <application
         android:name=".CallTimerApp"
         android:allowBackup="false"
@@ -61,6 +70,18 @@
         <receiver
             android:name=".notification.NotificationActionReceiver"
             android:exported="false" />
+
+        <service
+            android:name=".whatsapp.WhatsAppAccessibilityService"
+            android:exported="true"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
 
     </application>
 </manifest>

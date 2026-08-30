@@ -125,5 +125,46 @@
             android:textColor="@color/text_secondary"
             android:textStyle="italic" />
 
+        <!-- WhatsApp accessibility -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="WhatsApp calls (Accessibility)"
+            android:textColor="@color/text_primary"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="WhatsApp has no official way for another app to detect its calls, so this uses Android's Accessibility service to watch WhatsApp's own on-screen call timer. It only looks at WhatsApp's screens, never reads or sends messages, and never taps or controls anything — detection and alerting only. This is the most fragile part of the app: WhatsApp updates can occasionally break detection until it's re-checked."
+            android:textColor="@color/text_secondary" />
+
+        <TextView
+            android:id="@+id/accessibilityStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@color/surface"
+            android:padding="12dp"
+            android:text="Status: NOT ENABLED"
+            android:textColor="@color/text_primary" />
+
+        <Button
+            android:id="@+id/enableAccessibilityButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Enable Accessibility" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="After tapping Enable Accessibility: find &quot;Call Timer&quot; in the list that opens, turn it on, and confirm the system warning dialog. Also remember to turn on the &quot;WhatsApp calls&quot; toggle on the main screen — Accessibility alone doesn't start timing WhatsApp calls."
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp" />
+
     </LinearLayout>
 </ScrollView>

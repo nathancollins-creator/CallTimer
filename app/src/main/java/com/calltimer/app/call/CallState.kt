@@ -19,11 +19,8 @@ enum class CallState {
 
 enum class CallSource {
     CELLULAR,
+    WHATSAPP,
     TEST
-    // WHATSAPP intentionally left out of this version - see README "What's
-    // deferred to a later version". CallTimerEngine takes a CallSource so a
-    // future WhatsApp detector can plug into the exact same engine without
-    // changing anything in this file or in CallTimerEngine.
 }
 
 enum class CallDirection {

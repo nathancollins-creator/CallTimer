@@ -83,13 +83,11 @@ class CallTimerService : Service(), CallTimerListener {
         val justReachedLimit = snapshot.limitFired && !previousSnapshot.limitFired
 
         if (justWarned && settings.warningEnabled) {
-            manager.notify(CallTimerNotification.ALERT_NOTIFICATION_ID, CallTimerNotification.buildWarning(this))
+            manager.notify(CallTimerNotification.ALERT_NOTIFICATION_ID, CallTimerNotification.buildWarning(this, snapshot))
         }
         if (justReachedLimit) {
-            manager.notify(
-                CallTimerNotification.ALERT_NOTIFICATION_ID,
-                CallTimerNotification.buildLimitReached(this, settings.soundEnabled, settings.vibrateEnabled)
-            )
+            manager.notify(CallTimerNotification.ALERT_NOTIFICATION_ID, CallTimerNotification.buildLimitReached(this, snapshot))
+            AlertPlayer.playLimitAlert(this, settings)
         }
 
         previousSnapshot = snapshot

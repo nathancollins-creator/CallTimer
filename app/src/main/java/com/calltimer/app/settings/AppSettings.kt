@@ -2,6 +2,7 @@ package com.calltimer.app.settings
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.calltimer.app.notification.AlertSoundMode
 
 class AppSettings(context: Context) {
 
@@ -12,8 +13,10 @@ class AppSettings(context: Context) {
         private const val KEY_DURATION_SECONDS = "duration_seconds"
         private const val KEY_ENABLED = "enabled"
         private const val KEY_WARNING_ENABLED = "warning_enabled"
-        private const val KEY_SOUND_ENABLED = "sound_enabled"
         private const val KEY_VIBRATE_ENABLED = "vibrate_enabled"
+        private const val KEY_ALERT_SOUND_MODE = "alert_sound_mode"
+        private const val KEY_CUSTOM_RINGTONE_URI = "custom_ringtone_uri"
+        private const val KEY_WHATSAPP_ENABLED = "whatsapp_enabled"
 
         const val DEFAULT_DURATION_SECONDS = 10 * 60 // 10:00, per spec
         const val WARNING_LEAD_SECONDS = 60           // "warn 1 minute before"
@@ -31,11 +34,22 @@ class AppSettings(context: Context) {
         get() = prefs.getBoolean(KEY_WARNING_ENABLED, true)
         set(value) = prefs.edit().putBoolean(KEY_WARNING_ENABLED, value).apply()
 
-    var soundEnabled: Boolean
-        get() = prefs.getBoolean(KEY_SOUND_ENABLED, true)
-        set(value) = prefs.edit().putBoolean(KEY_SOUND_ENABLED, value).apply()
-
+    /** Applies to every alert style below - a spoken/tone/ringtone alert can still be paired with vibration. */
     var vibrateEnabled: Boolean
         get() = prefs.getBoolean(KEY_VIBRATE_ENABLED, true)
         set(value) = prefs.edit().putBoolean(KEY_VIBRATE_ENABLED, value).apply()
+
+    var alertSoundMode: AlertSoundMode
+        get() = AlertSoundMode.entries.firstOrNull { it.name == prefs.getString(KEY_ALERT_SOUND_MODE, null) }
+            ?: AlertSoundMode.DEFAULT
+        set(value) = prefs.edit().putString(KEY_ALERT_SOUND_MODE, value.name).apply()
+
+    /** Only meaningful when alertSoundMode == CUSTOM. Null until the user has picked one. */
+    var customRingtoneUri: String?
+        get() = prefs.getString(KEY_CUSTOM_RINGTONE_URI, null)
+        set(value) = prefs.edit().putString(KEY_CUSTOM_RINGTONE_URI, value).apply()
+
+    var whatsappEnabled: Boolean
+        get() = prefs.getBoolean(KEY_WHATSAPP_ENABLED, false)
+        set(value) = prefs.edit().putBoolean(KEY_WHATSAPP_ENABLED, value).apply()
 }
