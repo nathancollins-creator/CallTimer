@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Call Timer</string>
+    <string name="tagline">Detects when a call connects, times it, and alerts you \u2014 it never ends the call for you.</string>
+    <string name="channel_name_status">Call Timer status</string>
+    <string name="channel_desc_status">Shows whether Call Timer is watching for calls, and the countdown once one connects</string>
+    <string name="channel_name_alert">Call Timer alerts</string>
+    <string name="channel_desc_alert">The 1-minute warning and time-limit-reached alert</string>
+</resources>

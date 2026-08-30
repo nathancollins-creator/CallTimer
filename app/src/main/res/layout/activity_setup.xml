@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Permissions / Setup"
+            android:textColor="@color/text_primary"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <!-- Phone state permission -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="Phone state"
+            android:textColor="@color/text_primary"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Lets Call Timer see whether a call is idle, ringing, or connected — nothing more. It cannot see who is calling, and it is never used to control or end a call."
+            android:textColor="@color/text_secondary" />
+
+        <TextView
+            android:id="@+id/phoneStateStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@color/surface"
+            android:padding="12dp"
+            android:text="Status: NOT GRANTED"
+            android:textColor="@color/text_primary" />
+
+        <Button
+            android:id="@+id/grantPhoneStateButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Grant" />
+
+        <!-- Notifications -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="Notifications"
+            android:textColor="@color/text_primary"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Needed to show the countdown and the 1-minute/time-limit alerts. Required on Android 13 and newer."
+            android:textColor="@color/text_secondary" />
+
+        <TextView
+            android:id="@+id/notificationStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@color/surface"
+            android:padding="12dp"
+            android:text="Status: NOT GRANTED"
+            android:textColor="@color/text_primary" />
+
+        <Button
+            android:id="@+id/grantNotificationButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Grant" />
+
+        <!-- Battery optimization -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="Background reliability"
+            android:textColor="@color/text_primary"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Samsung phones can aggressively stop background apps to save battery, even ones showing a notification. Exempting Call Timer from battery optimization makes it far more likely to keep watching for calls reliably. This is optional but recommended on Samsung devices."
+            android:textColor="@color/text_secondary" />
+
+        <TextView
+            android:id="@+id/batteryStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@color/surface"
+            android:padding="12dp"
+            android:text="Status: NOT EXEMPTED"
+            android:textColor="@color/text_primary" />
+
+        <Button
+            android:id="@+id/batteryButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Exempt from battery optimization" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="On Samsung specifically, it also helps to open Settings → Apps → Call Timer → Battery, and make sure it is NOT set to &quot;Put app to sleep&quot; or included in any &quot;sleeping/deep-sleeping apps&quot; list under Settings → Battery → Background usage limits."
+            android:textColor="@color/text_secondary"
+            android:textStyle="italic" />
+
+    </LinearLayout>
+</ScrollView>

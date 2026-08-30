@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- The ONLY call-related permission this version needs. It gives read-only
+         access to call state (IDLE / RINGING / OFFHOOK) - enough to detect a
+         connected call, but not enough to see who's calling or to control the
+         call in any way. See CellularCallDetector.kt for the honest explanation
+         of what this permission can and cannot tell us. -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!-- Optional: lets us send the user straight to the "exempt from battery
+         optimization" screen for this app, which Samsung's Device Care can
+         otherwise use to kill a long-running background service. We only ever
+         navigate the user to the system settings screen for this - we never
+         request the permission silently or assume it's granted. -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+    <application
+        android:name=".CallTimerApp"
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.CallTimer"
+        tools:targetApi="34">
+
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".ui.SetupActivity" android:exported="false" />
+        <activity android:name=".ui.TestActivity" android:exported="false" />
+
+        <!-- Runs continuously while the user has Call Timer enabled (not just
+             during a call) so it can keep listening for phone-state changes in
+             the background. foregroundServiceType="specialUse" is the category
+             Android expects for "watches system state and alerts the user" work
+             that doesn't fit the other predefined types (mediaPlayback, location,
+             etc.) - see CallTimerService.kt for the declared reason string. -->
+        <service
+            android:name=".notification.CallTimerService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Detects when a phone call connects so it can time it and alert the user; never ends the call." />
+        </service>
+
+        <receiver
+            android:name=".notification.NotificationActionReceiver"
+            android:exported="false" />
+
+    </application>
+</manifest>

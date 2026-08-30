@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textColor="@color/text_primary"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="20dp"
+            android:text="@string/tagline"
+            android:textColor="@color/text_secondary" />
+
+        <!-- Status -->
+        <TextView
+            android:id="@+id/statusHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/surface"
+            android:padding="16dp"
+            android:text="🔴 DISABLED"
+            android:textColor="@color/text_primary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/statusDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/surface"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="16dp"
+            android:text="Not watching for calls"
+            android:textColor="@color/text_secondary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Maximum call duration"
+            android:textColor="@color/text_primary"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:id="@+id/durationPresets"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical">
+
+            <RadioButton android:id="@+id/duration5" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="5 minutes" android:textColor="@color/text_primary" />
+            <RadioButton android:id="@+id/duration10" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="10 minutes (default)" android:textColor="@color/text_primary" android:checked="true" />
+            <RadioButton android:id="@+id/duration15" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="15 minutes" android:textColor="@color/text_primary" />
+            <RadioButton android:id="@+id/duration20" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="20 minutes" android:textColor="@color/text_primary" />
+            <RadioButton android:id="@+id/duration30" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="30 minutes" android:textColor="@color/text_primary" />
+            <RadioButton android:id="@+id/durationCustom" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Custom:" android:textColor="@color/text_primary" />
+        </RadioGroup>
+
+        <EditText
+            android:id="@+id/customDurationMinutes"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:enabled="false"
+            android:hint="minutes"
+            android:inputType="number"
+            android:textColor="@color/text_primary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Alert settings"
+            android:textColor="@color/text_primary"
+            android:textStyle="bold" />
+
+        <CheckBox
+            android:id="@+id/warningCheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Warn me 1 minute before"
+            android:textColor="@color/text_primary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="When time expires:"
+            android:textColor="@color/text_secondary" />
+
+        <CheckBox
+            android:id="@+id/soundCheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Sound"
+            android:textColor="@color/text_primary" />
+
+        <CheckBox
+            android:id="@+id/vibrateCheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Vibrate"
+            android:textColor="@color/text_primary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Call types"
+            android:textColor="@color/text_primary"
+            android:textStyle="bold" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:enabled="false"
+            android:text="Normal phone calls"
+            android:textColor="@color/text_primary" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:enabled="false"
+            android:text="WhatsApp calls (coming in a future version)"
+            android:textColor="@color/text_secondary" />
+
+        <Button
+            android:id="@+id/enableButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:backgroundTint="@color/primary"
+            android:text="ENABLE CALL TIMER"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/disableButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="@color/surface"
+            android:text="DISABLE CALL TIMER"
+            android:textColor="@color/text_primary" />
+
+        <Button
+            android:id="@+id/setupButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="Permissions / Setup" />
+
+        <Button
+            android:id="@+id/testButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Test / Debug screen" />
+
+    </LinearLayout>
+</ScrollView>
