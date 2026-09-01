@@ -13,8 +13,26 @@ android {
         // support a much wider range of devices than the earlier design.
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "0.2.0-poc"
+        versionCode = 3
+        versionName = "0.3.0-callguard"
+    }
+
+    // Fixed debug-signing key, committed at keystore/debug.keystore, so every
+    // build - yours locally, GitHub Actions', anyone else's - produces an
+    // APK with the SAME signature. Without this, each machine/CI run falls
+    // back to its own auto-generated ~/.android/debug.keystore, and Android
+    // refuses to install a differently-signed APK as an "update" to an
+    // already-installed app - you'd have to uninstall the old one every
+    // single time. This is a standard, low-stakes debug key (not a secret -
+    // debug keystores are never used for a real Play Store release), so
+    // there's no harm in it being committed to the repo.
+    signingConfigs {
+        create("debugFixed") {
+            storeFile = file("../keystore/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
     }
 
     buildTypes {
@@ -24,6 +42,7 @@ android {
         }
         debug {
             isDebuggable = true
+            signingConfig = signingConfigs.getByName("debugFixed")
         }
     }
 
