@@ -12,10 +12,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.calltimer.app.databinding.ActivitySetupBinding
+import com.calltimer.app.settings.AppSettings
 
 class SetupActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySetupBinding
+    private lateinit var settings: AppSettings
 
     private val permissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { refresh() }
@@ -24,6 +26,8 @@ class SetupActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySetupBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        settings = AppSettings(this)
+        binding.whatsappCheck.isChecked = settings.whatsappEnabled
 
         binding.grantPhoneStateButton.setOnClickListener {
             permissionLauncher.launch(Manifest.permission.READ_PHONE_STATE)
@@ -45,6 +49,9 @@ class SetupActivity : AppCompatActivity() {
         }
         binding.enableAccessibilityButton.setOnClickListener {
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+        }
+        binding.whatsappCheck.setOnCheckedChangeListener { _, checked ->
+            settings.whatsappEnabled = checked
         }
     }
 

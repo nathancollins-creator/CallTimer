@@ -12,7 +12,7 @@ data class CallTimerSnapshot(
     val direction: CallDirection = CallDirection.UNKNOWN,
     val totalSeconds: Int = 0,
     val elapsedSeconds: Int = 0,
-    val warningFired: Boolean = false,
+    val firedWarningSeconds: Set<Int> = emptySet(),
     val limitFired: Boolean = false,
     val isSimulated: Boolean = false
 ) {
@@ -92,7 +92,7 @@ object CallTimerEngine {
             direction = direction,
             totalSeconds = duration,
             elapsedSeconds = 0,
-            warningFired = false,
+            firedWarningSeconds = emptySet(),
             limitFired = false,
             isSimulated = simulated
         )
@@ -112,7 +112,7 @@ object CallTimerEngine {
         resetSoon()
     }
 
-    /** User turned Call Timer off entirely. */
+    /** User turned CallGuard off entirely. */
     fun stopAll() {
         handler.removeCallbacks(tick)
         activeToken = null
@@ -126,19 +126,21 @@ object CallTimerEngine {
 
         val elapsed = snapshot.elapsedSeconds + 1
         val remaining = (snapshot.totalSeconds - elapsed).coerceAtLeast(0)
-        var warningFired = snapshot.warningFired
+        var firedWarnings = snapshot.firedWarningSeconds
         var limitFired = snapshot.limitFired
 
-        if (!warningFired && settings.warningEnabled && remaining <= AppSettings.WARNING_LEAD_SECONDS) {
-            warningFired = true
-            EventLog.add("Warning issued — 1 minute remaining")
+        for (point in settings.warningPointsSeconds) {
+            if (point !in firedWarnings && remaining <= point) {
+                firedWarnings = firedWarnings + point
+                EventLog.add("Warning issued — ${formatMinutesLabel(point)} remaining")
+            }
         }
         if (!limitFired && remaining <= 0) {
             limitFired = true
-            EventLog.add("TIME LIMIT REACHED")
+            EventLog.add("CALL LIMIT REACHED")
         }
 
-        snapshot = snapshot.copy(elapsedSeconds = elapsed, warningFired = warningFired, limitFired = limitFired)
+        snapshot = snapshot.copy(elapsedSeconds = elapsed, firedWarningSeconds = firedWarnings, limitFired = limitFired)
         publish()
 
         if (limitFired) {
@@ -168,5 +170,13 @@ object CallTimerEngine {
         val m = totalSeconds / 60
         val s = totalSeconds % 60
         return "%d:%02d".format(m, s)
+    }
+
+    fun formatMinutesLabel(totalSeconds: Int): String = when {
+        totalSeconds % 60 == 0 && totalSeconds >= 60 -> {
+            val m = totalSeconds / 60
+            if (m == 1) "1 minute" else "$m minutes"
+        }
+        else -> "${totalSeconds}s"
     }
 }

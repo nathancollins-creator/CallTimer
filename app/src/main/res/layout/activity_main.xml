@@ -49,25 +49,36 @@
             android:text="Not watching for calls"
             android:textColor="@color/text_secondary" />
 
+        <!-- ===== CALL LIMIT ===== -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Maximum call duration"
+            android:layout_marginTop="28dp"
+            android:text="CALL LIMIT"
             android:textColor="@color/text_primary"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/callLimitDisplay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="20:00"
+            android:textColor="@color/primary"
+            android:textSize="48sp"
             android:textStyle="bold" />
 
         <RadioGroup
             android:id="@+id/durationPresets"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
             android:orientation="vertical">
 
             <RadioButton android:id="@+id/duration5" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="5 minutes" android:textColor="@color/text_primary" />
-            <RadioButton android:id="@+id/duration10" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="10 minutes (default)" android:textColor="@color/text_primary" android:checked="true" />
+            <RadioButton android:id="@+id/duration10" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="10 minutes" android:textColor="@color/text_primary" />
             <RadioButton android:id="@+id/duration15" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="15 minutes" android:textColor="@color/text_primary" />
-            <RadioButton android:id="@+id/duration20" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="20 minutes" android:textColor="@color/text_primary" />
+            <RadioButton android:id="@+id/duration20" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="20 minutes (default)" android:textColor="@color/text_primary" android:checked="true" />
             <RadioButton android:id="@+id/duration30" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="30 minutes" android:textColor="@color/text_primary" />
             <RadioButton android:id="@+id/durationCustom" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Custom:" android:textColor="@color/text_primary" />
         </RadioGroup>
@@ -82,27 +93,64 @@
             android:inputType="number"
             android:textColor="@color/text_primary" />
 
+        <!-- ===== WARNING ===== -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Alert settings"
+            android:layout_marginTop="28dp"
+            android:text="WARNING"
             android:textColor="@color/text_primary"
             android:textStyle="bold" />
 
         <CheckBox
-            android:id="@+id/warningCheck"
+            android:id="@+id/warning5MinCheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:checked="true"
+            android:text="5 minutes before"
+            android:textColor="@color/text_primary" />
+
+        <CheckBox
+            android:id="@+id/warning1MinCheck"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
-            android:text="Warn me 1 minute before"
+            android:text="1 minute before"
             android:textColor="@color/text_primary" />
+
+        <!-- ===== WHEN LIMIT IS REACHED ===== -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="WHEN LIMIT IS REACHED"
+            android:textColor="@color/text_primary"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:background="@color/surface"
+            android:padding="12dp"
+            android:text="✓ Alert only"
+            android:textColor="@color/text_primary"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Automatically ending the call isn't offered in this version. Reliably ending a phone call on modern Android requires becoming the phone's full default calling app (dial pad, call screen, the works) — there's no lighter-weight way to do it. Rather than turn CallGuard into a complete phone app just for this one feature, it focuses on making the alert itself as dependable as possible instead."
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Time-limit alert style:"
+            android:text="Alert style:"
             android:textColor="@color/text_secondary" />
 
         <RadioGroup
@@ -145,45 +193,13 @@
             android:text="Vibrate"
             android:textColor="@color/text_primary" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Call types"
-            android:textColor="@color/text_primary"
-            android:textStyle="bold" />
-
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:enabled="false"
-            android:text="Normal phone calls"
-            android:textColor="@color/text_primary" />
-
-        <CheckBox
-            android:id="@+id/whatsappCheck"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="false"
-            android:text="WhatsApp calls"
-            android:textColor="@color/text_primary" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Needs Accessibility permission — see Permissions / Setup. Detects and alerts only; never touches WhatsApp's controls."
-            android:textColor="@color/text_secondary"
-            android:textSize="12sp" />
-
         <Button
             android:id="@+id/enableButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
             android:backgroundTint="@color/primary"
-            android:text="ENABLE CALL TIMER"
+            android:text="ENABLE CALLGUARD"
             android:textColor="@android:color/white" />
 
         <Button
@@ -192,7 +208,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:backgroundTint="@color/surface"
-            android:text="DISABLE CALL TIMER"
+            android:text="DISABLE CALLGUARD"
             android:textColor="@color/text_primary" />
 
         <Button

@@ -18,7 +18,7 @@ import com.calltimer.app.settings.AppSettings
 import com.calltimer.app.util.EventLog
 
 /**
- * Runs for as long as the user has Call Timer switched ON (not just during a
+ * Runs for as long as the user has CallGuard switched ON (not just during a
  * call) - it has to, since that's the only way to keep listening for the
  * next call while the app is backgrounded. A visible, low-priority
  * notification is the trade Android requires for that: without one, Android
@@ -79,11 +79,12 @@ class CallTimerService : Service(), CallTimerListener {
         manager.notify(CallTimerNotification.STATUS_NOTIFICATION_ID, CallTimerNotification.buildStatus(this, snapshot))
 
         val settings = AppSettings(this)
-        val justWarned = snapshot.warningFired && !previousSnapshot.warningFired
+        val newlyFiredWarnings = snapshot.firedWarningSeconds - previousSnapshot.firedWarningSeconds
         val justReachedLimit = snapshot.limitFired && !previousSnapshot.limitFired
 
-        if (justWarned && settings.warningEnabled) {
-            manager.notify(CallTimerNotification.ALERT_NOTIFICATION_ID, CallTimerNotification.buildWarning(this, snapshot))
+        // Highest lead-time (e.g. 5 min) first if more than one crosses in the same tick.
+        newlyFiredWarnings.sortedDescending().forEach { point ->
+            manager.notify(CallTimerNotification.ALERT_NOTIFICATION_ID, CallTimerNotification.buildWarning(this, snapshot, point))
         }
         if (justReachedLimit) {
             manager.notify(CallTimerNotification.ALERT_NOTIFICATION_ID, CallTimerNotification.buildLimitReached(this, snapshot))

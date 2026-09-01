@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">Call Timer</string>
-    <string name="tagline">Detects when a call connects, times it, and alerts you \u2014 it never ends the call for you.</string>
-    <string name="channel_name_status">Call Timer status</string>
-    <string name="channel_desc_status">Shows whether Call Timer is watching for calls, and the countdown once one connects</string>
-    <string name="channel_name_alert">Call Timer alerts</string>
-    <string name="channel_desc_alert">The 1-minute warning and time-limit-reached alert</string>
-    <string name="accessibility_service_description">Lets Call Timer detect when a WhatsApp voice call is on screen so it can time it and alert you. It only reads what\'s on screen while WhatsApp is open — it never reads or sends chat messages, and it never taps or controls anything in WhatsApp.</string>
+    <string name="app_name">CallGuard</string>
+    <string name="tagline">Never go over your call limit.</string>
+    <string name="channel_name_status">CallGuard status</string>
+    <string name="channel_desc_status">Shows whether CallGuard is watching for calls, and the countdown once one connects</string>
+    <string name="channel_name_alert">CallGuard alerts</string>
+    <string name="channel_desc_alert">The warning and call-limit-reached alerts</string>
+    <string name="accessibility_service_description">Lets CallGuard detect when a WhatsApp voice call is on screen so it can time it and alert you. It only reads what\'s on screen while WhatsApp is open — it never reads or sends chat messages, and it never taps or controls anything in WhatsApp. Experimental and off by default.</string>
 </resources>

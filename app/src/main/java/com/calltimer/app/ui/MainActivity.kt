@@ -54,18 +54,28 @@ class MainActivity : AppCompatActivity(), CallTimerListener {
                 binding.duration30.id -> 30
                 else -> null
             }
-            if (minutes != null) settings.durationSeconds = minutes * 60
+            if (minutes != null) {
+                settings.durationSeconds = minutes * 60
+                updateCallLimitDisplay()
+            }
         }
         binding.customDurationMinutes.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
                 val minutes = binding.customDurationMinutes.text.toString().toIntOrNull()
-                if (minutes != null && minutes > 0) settings.durationSeconds = minutes * 60
+                if (minutes != null && minutes > 0) {
+                    settings.durationSeconds = minutes * 60
+                    updateCallLimitDisplay()
+                }
             }
         }
 
-        binding.warningCheck.setOnCheckedChangeListener { _, checked -> settings.warningEnabled = checked }
+        binding.warning5MinCheck.setOnCheckedChangeListener { _, checked ->
+            settings.setWarningPointEnabled(AppSettings.FIVE_MIN_WARNING_SECONDS, checked)
+        }
+        binding.warning1MinCheck.setOnCheckedChangeListener { _, checked ->
+            settings.setWarningPointEnabled(AppSettings.ONE_MIN_WARNING_SECONDS, checked)
+        }
         binding.vibrateCheck.setOnCheckedChangeListener { _, checked -> settings.vibrateEnabled = checked }
-        binding.whatsappCheck.setOnCheckedChangeListener { _, checked -> settings.whatsappEnabled = checked }
 
         binding.alertSoundGroup.setOnCheckedChangeListener { _, checkedId ->
             val mode = when (checkedId) {
@@ -115,6 +125,10 @@ class MainActivity : AppCompatActivity(), CallTimerListener {
         }
     }
 
+    private fun updateCallLimitDisplay() {
+        binding.callLimitDisplay.text = CallTimerEngine.format(settings.durationSeconds)
+    }
+
     private fun onEnable() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
             != PackageManager.PERMISSION_GRANTED
@@ -127,13 +141,13 @@ class MainActivity : AppCompatActivity(), CallTimerListener {
 
         settings.timerEnabled = true
         CallTimerService.start(this)
-        Toast.makeText(this, "Call Timer enabled", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "CallGuard enabled", Toast.LENGTH_SHORT).show()
     }
 
     private fun onDisable() {
         settings.timerEnabled = false
         CallTimerService.stop(this)
-        Toast.makeText(this, "Call Timer disabled", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "CallGuard disabled", Toast.LENGTH_SHORT).show()
     }
 
     private fun requestNotificationPermissionIfNeeded() {
@@ -160,9 +174,12 @@ class MainActivity : AppCompatActivity(), CallTimerListener {
                 binding.customDurationMinutes.setText(minutes.toString())
             }
         }
-        binding.warningCheck.isChecked = settings.warningEnabled
+        updateCallLimitDisplay()
+
+        val warningPoints = settings.warningPointsSeconds
+        binding.warning5MinCheck.isChecked = AppSettings.FIVE_MIN_WARNING_SECONDS in warningPoints
+        binding.warning1MinCheck.isChecked = AppSettings.ONE_MIN_WARNING_SECONDS in warningPoints
         binding.vibrateCheck.isChecked = settings.vibrateEnabled
-        binding.whatsappCheck.isChecked = settings.whatsappEnabled
 
         when (settings.alertSoundMode) {
             AlertSoundMode.SIREN -> binding.alertSiren.isChecked = true
@@ -207,7 +224,7 @@ class MainActivity : AppCompatActivity(), CallTimerListener {
             CallState.IDLE -> "Watching for calls"
             CallState.RINGING -> "Incoming call ringing…"
             CallState.DIALING -> "Call dialing…"
-            CallState.CONNECTED -> if (snapshot.limitFired) "TIME LIMIT REACHED" else "${CallTimerEngine.format(snapshot.remainingSeconds)} remaining"
+            CallState.CONNECTED -> if (snapshot.limitFired) "CALL LIMIT REACHED" else "${CallTimerEngine.format(snapshot.remainingSeconds)} remaining"
             CallState.ENDING, CallState.ENDED -> "Call ended"
         }
     }

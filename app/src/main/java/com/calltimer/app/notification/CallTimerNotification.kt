@@ -50,11 +50,11 @@ object CallTimerNotification {
         createIfMissing(CHANNEL_STATUS, context.getString(R.string.channel_name_status), context.getString(R.string.channel_desc_status), NotificationManager.IMPORTANCE_LOW) {
             setSound(null, null)
         }
-        createIfMissing(CHANNEL_WARNING, "Call Timer — 1 minute warning", "The one-minute-remaining warning", NotificationManager.IMPORTANCE_DEFAULT) {
+        createIfMissing(CHANNEL_WARNING, "CallGuard — warnings", "Warnings before your call limit is reached", NotificationManager.IMPORTANCE_DEFAULT) {
             // Deliberately left with its system default sound/vibration - the
             // warning has always just been on/off, never a chosen style.
         }
-        createIfMissing(CHANNEL_LIMIT_VISUAL, "Call Timer — time limit reached", "The time-limit alert (visual only - see in-app Alert style setting for sound)", NotificationManager.IMPORTANCE_HIGH) {
+        createIfMissing(CHANNEL_LIMIT_VISUAL, "CallGuard — call limit reached", "The call-limit alert (visual only - see in-app Alert style setting for sound)", NotificationManager.IMPORTANCE_HIGH) {
             setSound(null, null)
             enableVibration(false)
         }
@@ -83,12 +83,13 @@ object CallTimerNotification {
             .build()
     }
 
-    fun buildWarning(context: Context, snapshot: CallTimerSnapshot): Notification {
+    fun buildWarning(context: Context, snapshot: CallTimerSnapshot, warningPointSeconds: Int): Notification {
         ensureChannels(context)
+        val label = CallTimerEngine.formatMinutesLabel(warningPointSeconds)
         return NotificationCompat.Builder(context, CHANNEL_WARNING)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
-            .setContentTitle("Call Timer: 1 minute remaining")
-            .setContentText("Your ${sourceLabel(snapshot.source)} call will hit its time limit in 1 minute.")
+            .setContentTitle("CallGuard: $label remaining")
+            .setContentText("Your ${sourceLabel(snapshot.source)} call will hit its limit in $label.")
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .build()
@@ -99,8 +100,8 @@ object CallTimerNotification {
         ensureChannels(context)
         return NotificationCompat.Builder(context, CHANNEL_LIMIT_VISUAL)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
-            .setContentTitle("CALL TIMER: TIME LIMIT REACHED")
-            .setContentText("Your ${sourceLabel(snapshot.source)} call has reached its time limit. Call Timer will not end the call — hang up when you're ready.")
+            .setContentTitle("CALLGUARD: CALL LIMIT REACHED")
+            .setContentText("Your ${sourceLabel(snapshot.source)} call has reached its limit. CallGuard will not end the call — hang up when you're ready.")
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
@@ -115,14 +116,14 @@ object CallTimerNotification {
 
     private fun statusContentFor(s: CallTimerSnapshot): Pair<String, String> {
         return when (s.state) {
-            CallState.IDLE -> "Call Timer" to "Watching for calls"
-            CallState.RINGING -> "Call Timer" to "Incoming call ringing…"
-            CallState.DIALING -> "Call Timer" to "Call dialing…"
+            CallState.IDLE -> "CallGuard" to "Watching for calls"
+            CallState.RINGING -> "CallGuard" to "Incoming call ringing…"
+            CallState.DIALING -> "CallGuard" to "Call dialing…"
             CallState.CONNECTED -> {
-                val label = if (s.limitFired) "TIME LIMIT REACHED" else "${CallTimerEngine.format(s.remainingSeconds)} remaining"
-                (if (s.isSimulated) "Call Timer (TEST MODE)" else "Call Timer Active") to label
+                val label = if (s.limitFired) "CALL LIMIT REACHED" else "${CallTimerEngine.format(s.remainingSeconds)} remaining"
+                (if (s.isSimulated) "CallGuard (TEST MODE)" else "CallGuard Active") to label
             }
-            CallState.ENDING, CallState.ENDED -> "Call Timer" to "Call ended"
+            CallState.ENDING, CallState.ENDED -> "CallGuard" to "Call ended"
         }
     }
 }

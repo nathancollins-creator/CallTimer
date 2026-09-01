@@ -86,8 +86,9 @@ class TestActivity : AppCompatActivity(), CallTimerListener {
         }
         val timer = "${CallTimerEngine.format(snapshot.elapsedSeconds)} elapsed / ${CallTimerEngine.format(snapshot.totalSeconds)} limit"
         val lastAlert = when {
-            snapshot.limitFired -> "TIME LIMIT REACHED"
-            snapshot.warningFired -> "1-minute warning fired"
+            snapshot.limitFired -> "CALL LIMIT REACHED"
+            snapshot.firedWarningSeconds.isNotEmpty() ->
+                snapshot.firedWarningSeconds.sortedDescending().joinToString(", ") { "${CallTimerEngine.formatMinutesLabel(it)} warning fired" }
             else -> "Not yet triggered"
         }
 

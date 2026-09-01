@@ -12,14 +12,16 @@ class AppSettings(context: Context) {
     companion object {
         private const val KEY_DURATION_SECONDS = "duration_seconds"
         private const val KEY_ENABLED = "enabled"
-        private const val KEY_WARNING_ENABLED = "warning_enabled"
+        private const val KEY_WARNING_POINTS = "warning_points_seconds"
         private const val KEY_VIBRATE_ENABLED = "vibrate_enabled"
         private const val KEY_ALERT_SOUND_MODE = "alert_sound_mode"
         private const val KEY_CUSTOM_RINGTONE_URI = "custom_ringtone_uri"
         private const val KEY_WHATSAPP_ENABLED = "whatsapp_enabled"
 
-        const val DEFAULT_DURATION_SECONDS = 10 * 60 // 10:00, per spec
-        const val WARNING_LEAD_SECONDS = 60           // "warn 1 minute before"
+        const val DEFAULT_DURATION_SECONDS = 20 * 60 // 20:00 - CallGuard default per spec
+        const val FIVE_MIN_WARNING_SECONDS = 5 * 60
+        const val ONE_MIN_WARNING_SECONDS = 60
+        private val DEFAULT_WARNING_POINTS = setOf(FIVE_MIN_WARNING_SECONDS, ONE_MIN_WARNING_SECONDS)
     }
 
     var durationSeconds: Int
@@ -30,9 +32,23 @@ class AppSettings(context: Context) {
         get() = prefs.getBoolean(KEY_ENABLED, false)
         set(value) = prefs.edit().putBoolean(KEY_ENABLED, value).apply()
 
-    var warningEnabled: Boolean
-        get() = prefs.getBoolean(KEY_WARNING_ENABLED, true)
-        set(value) = prefs.edit().putBoolean(KEY_WARNING_ENABLED, value).apply()
+    /**
+     * Lead times (in seconds-before-limit) at which a warning fires. Stored
+     * as a set so the engine stays generic - today's UI only exposes the two
+     * points the spec asks for (5 min / 1 min), each independently
+     * toggleable, but nothing here hardcodes that there are exactly two.
+     */
+    var warningPointsSeconds: Set<Int>
+        get() {
+            val raw = prefs.getString(KEY_WARNING_POINTS, null) ?: return DEFAULT_WARNING_POINTS
+            return raw.split(',').mapNotNull { it.toIntOrNull() }.toSet()
+        }
+        set(value) = prefs.edit().putString(KEY_WARNING_POINTS, value.joinToString(",")).apply()
+
+    fun setWarningPointEnabled(seconds: Int, enabled: Boolean) {
+        val current = warningPointsSeconds
+        warningPointsSeconds = if (enabled) current + seconds else current - seconds
+    }
 
     /** Applies to every alert style below - a spoken/tone/ringtone alert can still be paired with vibration. */
     var vibrateEnabled: Boolean

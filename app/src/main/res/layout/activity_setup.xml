@@ -18,6 +18,13 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="CallGuard needs access to phone-call state so it can detect when a call starts and ends and measure its duration. It does not need your contacts, location, microphone, messages, or call recordings — and there is no account of any kind."
+            android:textColor="@color/text_secondary" />
+
         <!-- Phone state permission -->
         <TextView
             android:layout_width="wrap_content"
@@ -31,7 +38,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="Lets Call Timer see whether a call is idle, ringing, or connected — nothing more. It cannot see who is calling, and it is never used to control or end a call."
+            android:text="Lets CallGuard see whether a call is idle, ringing, or connected — nothing more. It cannot see who is calling, and it is never used to control or end a call."
             android:textColor="@color/text_secondary" />
 
         <TextView
@@ -64,7 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="Needed to show the countdown and the 1-minute/time-limit alerts. Required on Android 13 and newer."
+            android:text="Needed to show the countdown and the warning/limit alerts. Required on Android 13 and newer."
             android:textColor="@color/text_secondary" />
 
         <TextView
@@ -97,7 +104,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="Samsung phones can aggressively stop background apps to save battery, even ones showing a notification. Exempting Call Timer from battery optimization makes it far more likely to keep watching for calls reliably. This is optional but recommended on Samsung devices."
+            android:text="Some phones (Samsung especially) can aggressively stop background apps to save battery, even ones showing a notification. Exempting CallGuard from battery optimization makes it far more likely to keep watching for calls reliably. Only request this if you notice missed alerts — it isn't required for most phones."
             android:textColor="@color/text_secondary" />
 
         <TextView
@@ -121,25 +128,34 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="On Samsung specifically, it also helps to open Settings → Apps → Call Timer → Battery, and make sure it is NOT set to &quot;Put app to sleep&quot; or included in any &quot;sleeping/deep-sleeping apps&quot; list under Settings → Battery → Background usage limits."
+            android:text="On Samsung specifically, it also helps to open Settings → Apps → CallGuard → Battery, and make sure it is NOT set to &quot;Put app to sleep&quot; or included in any &quot;sleeping/deep-sleeping apps&quot; list under Settings → Battery → Background usage limits."
             android:textColor="@color/text_secondary"
             android:textStyle="italic" />
 
-        <!-- WhatsApp accessibility -->
+        <!-- Experimental: WhatsApp accessibility -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="WhatsApp calls (Accessibility)"
-            android:textColor="@color/text_primary"
+            android:layout_marginTop="36dp"
+            android:text="EXPERIMENTAL — WhatsApp calls"
+            android:textColor="@color/warn"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="WhatsApp has no official way for another app to detect its calls, so this uses Android's Accessibility service to watch WhatsApp's own on-screen call timer. It only looks at WhatsApp's screens, never reads or sends messages, and never taps or controls anything — detection and alerting only. This is the most fragile part of the app: WhatsApp updates can occasionally break detection until it's re-checked."
+            android:text="Off by default and separate from CallGuard's core cellular-call feature. WhatsApp has no official way for another app to detect its calls, so this uses Android's Accessibility service to watch WhatsApp's own on-screen call timer — it only looks at WhatsApp's screens, never reads or sends messages, and never taps or controls anything. It's also the most fragile part of the app (WhatsApp updates can break detection) and the kind of feature that invites extra scrutiny in a Google Play review. If you plan to publish CallGuard, leave this off."
             android:textColor="@color/text_secondary" />
+
+        <CheckBox
+            android:id="@+id/whatsappCheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:checked="false"
+            android:text="Enable WhatsApp call timing (experimental)"
+            android:textColor="@color/text_primary" />
 
         <TextView
             android:id="@+id/accessibilityStatus"
@@ -162,7 +178,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="After tapping Enable Accessibility: find &quot;Call Timer&quot; in the list that opens, turn it on, and confirm the system warning dialog. Also remember to turn on the &quot;WhatsApp calls&quot; toggle on the main screen — Accessibility alone doesn't start timing WhatsApp calls."
+            android:text="After tapping Enable Accessibility: find &quot;CallGuard&quot; in the list that opens, turn it on, and confirm the system warning dialog. Both the checkbox above AND this Accessibility grant are required — either one alone does nothing."
             android:textColor="@color/text_secondary"
             android:textSize="12sp" />
 
